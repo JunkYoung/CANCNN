@@ -7,13 +7,13 @@ from preprocess import make_dataset
 from model import CNN
 
 
-#Config.NAME = "DoS"
+Config.NAME = "DoS"
 #Config.NAME = "Fuzzy"
-Config.NAME = "gear"
+#Config.NAME = "gear"
 #Config.NAME = "RPM"
 
 Config.NUM_ID = 2048
-Config.UNIT_INTVL = 100/1000
+Config.UNIT_INTVL = 10000/1000
 Config.NUM_INTVL = 5
 
 Config.FILENAME = f"dataset/{Config.NAME}_dataset.csv"
@@ -34,23 +34,26 @@ if gpus:
 
 
 if __name__ == "__main__":
+    n_num_intvl = 3
+    res = []
+    for j in range(n_num_intvl):
+        Config.NUM_INTVL = (j+1)*5
+        print(f'{Config.NAME} {Config.UNIT_INTVL} {2*Config.NUM_INTVL}')
+        Config.MODELNAME = f"models/{Config.NAME}unit{int(Config.UNIT_INTVL*1000)}_num{Config.NUM_INTVL}.h5"
+        make_dataset(Config.FILENAME)
+        cnn = CNN(Config.MODELNAME)
+        cnn.train()
+        res.append(cnn.test())
+        shutil.rmtree(Config.DATAPATH)
+    np.save(f"results/{Config.NAME}_{int(Config.UNIT_INTVL*1000)}", res)
+
+
+    # Config.UNIT_INTVL = 10/1000
+    # Config.NUM_INTVL = 5
+    # print(f'{Config.NAME} {Config.UNIT_INTVL} {2*Config.NUM_INTVL}')
+    # Config.MODELNAME = f"models/{Config.NAME}unit{int(Config.UNIT_INTVL*1000)}_num{Config.NUM_INTVL}.h5"
     # make_dataset(Config.FILENAME)
     # cnn = CNN(Config.MODELNAME)
     # cnn.train()
-    # cnn.test()
-
-    n_unit_intvl = 5
-    n_num_intvl = 3
-    res = []
-    for i in range(n_unit_intvl):
-        Config.UNIT_INTVL = (i+1)*100/1000
-        for j in range(n_num_intvl):
-            Config.NUM_INTVL = (j+2)*5
-            print(f'{Config.NAME} {Config.UNIT_INTVL} {2*Config.NUM_INTVL}')
-            Config.MODELNAME = f"models/{Config.NAME}unit{int(Config.UNIT_INTVL*1000)}_num{Config.NUM_INTVL}.h5"
-            make_dataset(Config.FILENAME)
-            cnn = CNN(Config.MODELNAME)
-            cnn.train()
-            res.append(cnn.test())
-            shutil.rmtree(Config.DATAPATH)
-    np.save("Fuzzy", res)
+    # np.save(f"results/RPM_10_{5}", [cnn.test()])
+    # shutil.rmtree(Config.DATAPATH)

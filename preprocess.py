@@ -40,14 +40,14 @@ def make_dataset(filename):
         frequencys = []
         mean_IATs = []
         cur = start+i*Config.UNIT_INTVL
-        big_chunk = df[(df['0'] >= cur-Config.UNIT_INTVL*pow(2, Config.NUM_INTVL-1)) & (df['0'] < cur)]
+        big_chunk = df[(df['0'] >= cur-Config.UNIT_INTVL*5*(Config.NUM_INTVL-1)) & (df['0'] < cur)]
         labels.append(1) if 'T' in big_chunk.values else labels.append(0)
         cur_chunk = df[(df['0'] >= cur-Config.UNIT_INTVL) & (df['0'] < cur)]
         cur_count, cur_sum_IAT, pre_time = one_step(cur_chunk, pre_time)
         hist.append((cur_count, cur_sum_IAT))
 
         for j in range(Config.NUM_INTVL):
-            idx = i-pow(2, j)
+            idx = i-5*j
             if idx >= 0:
                 pre_count, pre_sum_IAT = hist[idx]
                 counts[j] = counts[j] - pre_count + cur_count
@@ -68,7 +68,7 @@ def make_dataset(filename):
         mean_IATs = np.array(mean_IATs).transpose()
         mean_IATs = np.array(pd.DataFrame(mean_IATs).replace([0, np.nan], 1))
         data = np.concatenate([frequencys, mean_IATs], -1)
-        np.save(Config.DATAPATH+str(i), data)       
+        np.save(Config.DATAPATH+str(i), data)
     np.save(Config.DATAPATH+"labels", np.array(labels))
     
 
