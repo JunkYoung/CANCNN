@@ -12,7 +12,7 @@ def DoS_variation(filename):
 
 def Fuzzy_variation(filename):
     df = pd.read_csv(filename, names=[str(x) for x in range(12)], header=None)
-    df['1'] = df.apply(lambda x: hex(~int(x['1'][2:], 16)-1)[3:] if x['11'] == 'T' else x['1'], axis = 1)
+    df['1'] = df.apply(lambda x: hex(~int(x['1'][2:], 16))[3:] if x['11'] == 'T' else x['1'], axis = 1)
     df.to_csv("dataset/Fuzzy_variation.csv", header=None)
 
 def one_step(chunk, pre_time):
@@ -40,6 +40,8 @@ def make_dataset(filename):
     pre_time = np.zeros(Config.NUM_ID)
     counts = np.zeros((Config.NUM_INTVL, Config.NUM_ID))
     sum_IATs = np.zeros((Config.NUM_INTVL, Config.NUM_ID))
+    counts2 = np.zeros((Config.NUM_INTVL, Config.NUM_ID))
+    sum_IATs2 = np.zeros((Config.NUM_INTVL, Config.NUM_ID))
     labels = []
     hist = []
 
@@ -52,7 +54,7 @@ def make_dataset(filename):
 
         cur = start+i*Config.UNIT_INTVL
 
-        big_chunk = df[(df['0'] >= cur-Config.UNIT_INTVL*Config.NUM_INTVL) & (df['0'] < cur)]
+        big_chunk = df[(df['0'] >= cur-Config.UNIT_INTVL2*Config.NUM_INTVL) & (df['0'] < cur)]
         labels.append(1) if 'T' in big_chunk.values else labels.append(0)
         
         cur_chunk = df[(df['0'] >= cur-Config.UNIT_INTVL) & (df['0'] < cur)]
@@ -73,6 +75,21 @@ def make_dataset(filename):
 
             frequencys.append(frequency)
             mean_IATs.append(mean_IAT)
+
+        for j in range(Config.NUM_INTVL):
+            idx = i-int(j*(Config.UNIT_INTVL2/Config.UNIT_INTVL)+1)
+            if idx >= 0:
+                pre_count, pre_sum_IAT = hist[idx]
+            else:
+                pre_count, pre_sum_IAT = np.zeros_like(cur_count), np.zeros_like(cur_sum_IAT)
+            
+            counts2[j] = counts2[j] + cur_count - pre_count
+            frequency = counts2[j]
+            sum_IATs2[j] = sum_IATs2[j] + cur_sum_IAT - pre_sum_IAT
+            mean_IAT = sum_IATs2[j]/(frequency+0.000001)
+
+            frequencys.append(frequency)
+            mean_IATs.append(mean_IAT)
         
         frequencys = np.array(frequencys).transpose()
         mean_IATs = np.array(mean_IATs).transpose()
@@ -85,5 +102,5 @@ def make_dataset(filename):
 if __name__ == "__main__":
     #DoS_variation(Config.FILENAME)
     #Fuzzy_variation(Config.FILENAME)
-    #make_dataset("dataset/Fuzzy_variation.csv")
-    make_dataset(Config.FILENAME)
+    make_dataset("dataset/DoS_variation.csv")
+    #make_dataset(Config.FILENAME)

@@ -1,0 +1,47 @@
+classification by ID
+DoS 00f0 
+    0.7327 0.9959 0.1013
+Fuzzy   
+    0.9936 0.9969 0.9837
+
+
+proposed algorithm 10ms
+DoS 00f0
+    1.000 1.000 1.000
+
+Fuzzy   
+    0.9998 1.000 0.9997
+
+
+proposed algorithm 50ms
+DoS 00f0    
+    0.9996 1.000 0.9993
+
+Fuzzy  
+    0.9995 1.000 0.9992
+
+
+proposed algorithm 100ms
+DoS 00f0    
+    0.9989 1.000 0.9985
+
+Fuzzy   
+    0.9989 1.000 0.9986
+
+
+proposed algorithm 500ms
+DoS 00f0    
+    0.9941 0.9928 1.000
+
+Fuzzy  
+    1.000 1.000 1.000
+
+
+proposed algorithm 1000ms
+DoS 00f0    
+    0.9941 0.9949 0.9975
+
+Fuzzy  
+    0.9980 1.000 0.9977
+
+

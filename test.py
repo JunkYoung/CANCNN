@@ -6,6 +6,8 @@ from config import Config
 from preprocess import make_dataset
 from model import CNN
 
+from generator import DataGenerator
+
 
 Config.NAME = "DoS"
 #Config.NAME = "Fuzzy"
@@ -33,8 +35,26 @@ if gpus:
     print(e)
 
 
+def gen_data():
+    params = {'dim': (Config.NUM_ID, 2*Config.NUM_INTVL),
+          'batch_size': 64,
+          'n_classes': 2,
+          'n_channels': 1,
+          'shuffle': True}
+    Config.DATAPATH = 'data/test/'
+    make_dataset("DoS_variation.csv")
+    data = os.listdir(Config.DATAPATH)
+    data.remove('labels.npy')
+    data = data[int(len(data)/10*8.5):]
+    labels = np.load(Config.DATAPATH+"labels.npy")
+    gen_test = DataGenerator(data, labels, **params)
+
+    return gen_test
+
+
 if __name__ == "__main__":
     make_dataset(Config.FILENAME)
     cnn = CNN(Config.MODELNAME)
     cnn.train()
+    cnn.gen_test = gen_data()
     cnn.test()
